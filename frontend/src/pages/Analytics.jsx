@@ -47,7 +47,7 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={categories} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis type="number" tick={{ fontSize: 12 }} />
+                <XAxis type="number" tick={{ fontSize: 12 }} tickFormatter={(v) => formatCurrency(v)} />
                 <YAxis dataKey="category" type="category" width={120} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(v) => formatCurrency(v)} />
                 <Bar dataKey="total" fill="#6366f1" radius={[0, 4, 4, 0]} />
@@ -65,7 +65,7 @@ export default function Analytics() {
               <LineChart data={summary.monthly_trend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => formatCurrency(v)} />
                 <Tooltip formatter={(v) => formatCurrency(v)} />
                 <Legend />
                 <Line type="monotone" dataKey="net" stroke="#6366f1" strokeWidth={2} name="Net Balance" dot={{ r: 4 }} />

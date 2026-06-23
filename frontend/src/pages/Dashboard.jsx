@@ -66,7 +66,7 @@ export default function Dashboard() {
             <BarChart data={summary.monthly_trend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => formatCurrency(v)} />
               <Tooltip formatter={(v) => formatCurrency(v)} />
               <Bar dataKey="income" fill="#10b981" name="Income" radius={[4, 4, 0, 0]} />
               <Bar dataKey="expenses" fill="#ef4444" name="Expenses" radius={[4, 4, 0, 0]} />

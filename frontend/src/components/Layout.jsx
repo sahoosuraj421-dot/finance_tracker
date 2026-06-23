@@ -22,7 +22,7 @@ export default function Layout({ children }) {
     <div className="app-layout">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="brand-icon">$</div>
+          <div className="brand-icon">₹</div>
           <div>
             <h1>FinTrack</h1>
             <p>Finance Tracker</p>

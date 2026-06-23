@@ -80,7 +80,7 @@ export default function Transactions() {
               <input type="text" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
             </label>
             <label>
-              Amount
+              Amount (₹)
               <input type="number" step="0.01" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
             </label>
           </div>

@@ -15,6 +15,7 @@ from app.services.analytics import (
     get_spending_by_category,
 )
 from app.models.transaction import Budget, Transaction
+from app.utils.currency import format_inr
 
 
 def create_finance_tools(db: Session):
@@ -27,12 +28,12 @@ def create_finance_tools(db: Session):
         sd = date.fromisoformat(start_date) if start_date else None
         ed = date.fromisoformat(end_date) if end_date else None
         summary = get_analytics_summary(db, sd, ed)
-        top_cats = ", ".join(f"{c['category']} (${c['amount']:,.2f})" for c in summary["top_categories"][:5])
+        top_cats = ", ".join(f"{c['category']} ({format_inr(c['amount'])})" for c in summary["top_categories"][:5])
         return (
             f"Financial Summary:\n"
-            f"- Total Income: ${summary['total_income']:,.2f}\n"
-            f"- Total Expenses: ${summary['total_expenses']:,.2f}\n"
-            f"- Net Balance: ${summary['net_balance']:,.2f}\n"
+            f"- Total Income: {format_inr(summary['total_income'])}\n"
+            f"- Total Expenses: {format_inr(summary['total_expenses'])}\n"
+            f"- Net Balance: {format_inr(summary['net_balance'])}\n"
             f"- Transaction Count: {summary['transaction_count']}\n"
             f"- Top Categories: {top_cats}"
         )
@@ -43,7 +44,7 @@ def create_finance_tools(db: Session):
         data = get_spending_by_category(db, month)
         if not data:
             return "No expense data found for the specified period."
-        lines = [f"- {d['category']}: ${d['total']:,.2f} ({d['count']} transactions)" for d in data]
+        lines = [f"- {d['category']}: {format_inr(d['total'])} ({d['count']} transactions)" for d in data]
         period = f" for {month}" if month else ""
         return f"Spending by category{period}:\n" + "\n".join(lines)
 
@@ -54,7 +55,7 @@ def create_finance_tools(db: Session):
         if not recurring:
             return "No recurring expenses detected."
         lines = [
-            f"- {r['description']}: ~${r['average_amount']:,.2f}/month ({r['occurrences']} times, last: {r['last_date']})"
+            f"- {r['description']}: ~{format_inr(r['average_amount'])}/month ({r['occurrences']} times, last: {r['last_date']})"
             for r in recurring[:10]
         ]
         return "Recurring expenses detected:\n" + "\n".join(lines)
@@ -66,10 +67,10 @@ def create_finance_tools(db: Session):
         m1, m2 = result["month1"], result["month2"]
         return (
             f"Month Comparison ({month1} vs {month2}):\n"
-            f"{month1}: Income ${m1['income']:,.2f}, Expenses ${m1['expenses']:,.2f}, Net ${m1['net']:,.2f}\n"
-            f"{month2}: Income ${m2['income']:,.2f}, Expenses ${m2['expenses']:,.2f}, Net ${m2['net']:,.2f}\n"
-            f"Expense change: ${result['expense_change']:+,.2f}\n"
-            f"Income change: ${result['income_change']:+,.2f}"
+            f"{month1}: Income {format_inr(m1['income'])}, Expenses {format_inr(m1['expenses'])}, Net {format_inr(m1['net'])}\n"
+            f"{month2}: Income {format_inr(m2['income'])}, Expenses {format_inr(m2['expenses'])}, Net {format_inr(m2['net'])}\n"
+            f"Expense change: {format_inr(result['expense_change'])}\n"
+            f"Income change: {format_inr(result['income_change'])}"
         )
 
     @tool
@@ -82,8 +83,8 @@ def create_finance_tools(db: Session):
         for a in alerts:
             icon = "⚠️" if a["status"] == "warning" else "🚨" if a["status"] == "exceeded" else "✅"
             lines.append(
-                f"{icon} {a['category']}: ${a['spent']:,.2f} / ${a['monthly_limit']:,.2f} "
-                f"({a['percentage_used']}% used, ${a['remaining']:,.2f} remaining)"
+                f"{icon} {a['category']}: {format_inr(a['spent'])} / {format_inr(a['monthly_limit'])} "
+                f"({a['percentage_used']}% used, {format_inr(a['remaining'])} remaining)"
             )
         return "Budget Status:\n" + "\n".join(lines)
 
@@ -96,7 +97,7 @@ def create_finance_tools(db: Session):
         else:
             db.add(Budget(category=category, monthly_limit=monthly_limit))
         db.commit()
-        return f"Budget set for '{category}': ${monthly_limit:,.2f}/month"
+        return f"Budget set for '{category}': {format_inr(monthly_limit)}/month"
 
     @tool
     def get_recent_activity(limit: int = 5) -> str:
@@ -105,7 +106,7 @@ def create_finance_tools(db: Session):
         if not txns:
             return "No transactions found."
         lines = [
-            f"- {t['date']}: {t['description']} | {t['category']} | ${abs(t['amount']):,.2f} ({t['type']})"
+            f"- {t['date']}: {t['description']} | {t['category']} | {format_inr(t['amount'])} ({t['type']})"
             for t in txns
         ]
         return "Recent transactions:\n" + "\n".join(lines)
@@ -128,7 +129,7 @@ def create_finance_tools(db: Session):
         )
         db.add(txn)
         db.commit()
-        return f"Added transaction: {description} | ${abs(amount):,.2f} | {category} on {date_str}"
+        return f"Added transaction: {description} | {format_inr(amount)} | {category} on {date_str}"
 
     @tool
     def search_transactions(keyword: str, limit: int = 10) -> str:
@@ -143,7 +144,7 @@ def create_finance_tools(db: Session):
         if not txns:
             return f"No transactions found matching '{keyword}'."
         lines = [
-            f"- {t.date}: {t.description} | {t.category} | ${abs(t.amount):,.2f}"
+            f"- {t.date}: {t.description} | {t.category} | {format_inr(t.amount)}"
             for t in txns
         ]
         return f"Transactions matching '{keyword}':\n" + "\n".join(lines)

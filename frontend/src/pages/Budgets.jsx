@@ -54,7 +54,7 @@ export default function Budgets() {
               <input type="text" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required placeholder="e.g. Food & Dining" />
             </label>
             <label>
-              Monthly Limit ($)
+              Monthly Limit (₹)
               <input type="number" step="0.01" min="1" value={form.monthly_limit} onChange={(e) => setForm({ ...form, monthly_limit: e.target.value })} required />
             </label>
           </div>
